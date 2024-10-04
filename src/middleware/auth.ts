@@ -26,7 +26,8 @@ export function verifyToken(req: NextRequest): DecodedToken | NextResponse {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
     return decoded;
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error);
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 }

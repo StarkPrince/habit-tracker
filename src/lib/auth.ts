@@ -18,8 +18,8 @@ export async function getUserId(req: NextRequest): Promise<string | null> {
         id: string;
       };
       return decoded.id;
-    } catch (error) {
-      // Invalid token
+    } catch (error: any) {
+      console.log(error);
       return null;
     }
   }

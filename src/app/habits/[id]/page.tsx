@@ -6,13 +6,11 @@ import HabitLineChart from '@/components/HabitLineChart';
 import { Habit } from '@/types';
 import { aggregateLogsByDay, DailyCount } from '@/utils/dataProcessing';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Circles } from 'react-loader-spinner';
 
 const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
 {
-    const router = useRouter();
     const { id } = params;
     const [habit, setHabit] = useState<Habit | null>(null);
     const [dailyCounts, setDailyCounts] = useState<DailyCount[]>([]);
