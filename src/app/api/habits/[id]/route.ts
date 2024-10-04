@@ -1,31 +1,22 @@
 // src/app/api/habits/[id]/route.ts
+import { getUserId } from "@/lib/auth";
 import dbConnect from "@/lib/mongoose";
 import Habit from "@/models/Habit";
-import { ObjectId } from "mongodb";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/authOptions";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  request: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
-    const { id } = params;
-
-    if (!ObjectId.isValid(id)) {
-      return NextResponse.json({ error: "Invalid Habit ID" }, { status: 400 });
+    const userId = await getUserId(req);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await dbConnect();
 
-    const habit = await Habit.findOne({ _id: id, user: session.user.id });
-
+    const habit = await Habit.findOne({ _id: params.id, user: userId });
     if (!habit) {
       return NextResponse.json({ error: "Habit not found" }, { status: 404 });
     }

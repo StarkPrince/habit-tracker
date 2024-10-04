@@ -1,35 +1,30 @@
+import { getUserId } from "@/lib/auth";
 import dbConnect from "@/lib/mongoose";
 import Habit from "@/models/Habit";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]/authOptions";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const userId = await getUserId(req);
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await dbConnect();
 
-    const habits = await Habit.find({ user: session.user.id }).sort({
-      createdAt: -1,
-    });
+    const habits = await Habit.find({ user: userId }).sort({ createdAt: -1 });
     return NextResponse.json(habits, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const userId = await getUserId(request);
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    console.log("session", session, request);
 
     const { name } = await request.json();
 
@@ -42,7 +37,7 @@ export async function POST(request: Request) {
 
     await dbConnect();
 
-    const existingHabit = await Habit.findOne({ name, user: session.user.id });
+    const existingHabit = await Habit.findOne({ name, user: userId });
 
     if (existingHabit) {
       return NextResponse.json(
@@ -51,7 +46,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const habit = await Habit.create({ name, user: session.user.id });
+    const habit = await Habit.create({ name, user: userId });
 
     return NextResponse.json(habit, { status: 201 });
   } catch (error: any) {

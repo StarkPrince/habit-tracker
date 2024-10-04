@@ -23,6 +23,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    console.log("Creating user", { name, email, password }, existingUser);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
