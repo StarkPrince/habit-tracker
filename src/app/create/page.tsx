@@ -1,8 +1,12 @@
-// src/app/create/page.tsx
 'use client'
 
 import ProtectedRoute from '@/components/ProtectedRoute'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import axios from 'axios'
+import { AlertCircle } from "lucide-react"
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -19,6 +23,7 @@ function CreateHabit()
 {
     const [name, setName] = useState<string>('')
     const [error, setError] = useState<string>('')
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) =>
@@ -28,36 +33,58 @@ function CreateHabit()
             setError('Habit name is required')
             return
         }
+        setIsLoading(true)
         try {
             await axios.post('/api/habits', { name })
             router.push('/')
         } catch (err: any) {
             setError(err.response?.data?.error || 'Failed to create habit')
+        } finally {
+            setIsLoading(false)
         }
     }
 
     return (
-        <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-            <h2 className="text-2xl font-semibold mb-4">Create New Habit</h2>
-            {error && <p className="text-red-500 mb-2">{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <label className="block mb-2">
-                    Habit Name:
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => { setName(e.target.value); setError('') }}
-                        className="w-full mt-1 p-2 border rounded"
-                        placeholder="e.g., Smoking"
-                    />
-                </label>
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                >
-                    Create
-                </button>
-            </form>
+        <div className="container mx-auto flex items-center justify-center min-h-screen p-4">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle>Create New Habit</CardTitle>
+                    <CardDescription>Enter a name for the habit you want to break</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit}>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="habit-name">Habit Name</Label>
+                                <Input
+                                    id="habit-name"
+                                    type="text"
+                                    placeholder="e.g., Smoking"
+                                    value={name}
+                                    onChange={(e) => { setName(e.target.value); setError('') }}
+                                    required
+                                />
+                            </div>
+                            {error && (
+                                <div className="flex items-center space-x-2 text-destructive">
+                                    <AlertCircle size={16} />
+                                    <p className="text-sm">{error}</p>
+                                </div>
+                            )}
+                        </div>
+                    </form>
+                </CardContent>
+                <CardFooter>
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Creating...' : 'Create Habit'}
+                    </Button>
+                </CardFooter>
+            </Card>
         </div>
     )
 }

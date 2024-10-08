@@ -1,10 +1,8 @@
-// src/components/HabitBarChart.tsx
-import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
-import React from 'react';
-import { Bar } from 'react-chartjs-2';
-import { DailyCount } from '../utils/dataProcessing';
+'use client';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DailyCount } from '@/utils/dataProcessing';
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 interface HabitBarChartProps
 {
@@ -13,54 +11,37 @@ interface HabitBarChartProps
 
 const HabitBarChart: React.FC<HabitBarChartProps> = ({ dailyCounts }) =>
 {
-    // Sort the data by date
     const sortedData = [...dailyCounts].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Prepare data for the chart
-    const labels = sortedData.map((dc) => dc.date);
-    const data = sortedData.map((dc) => dc.count);
-
-    const chartData = {
-        labels,
-        datasets: [
-            {
-                label: 'Occurrences',
-                data,
-                backgroundColor: 'rgba(75,192,192,0.6)',
-            },
-        ],
-    };
-
-    const options = {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top' as const,
-            },
-            title: {
-                display: true,
-                text: 'Habit Occurrences Over Time',
-            },
-        },
-        scales: {
-            x: {
-                ticks: {
-                    maxTicksLimit: 10, // Adjust as needed
-                    autoSkip: true,
-                },
-            },
-            y: {
-                beginAtZero: true,
-                precision: 0,
-            },
-        },
-    };
-
     return (
-        <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-2">Habit Performance</h3>
-            <Bar data={chartData} options={options} />
-        </div>
+        <Card>
+            <CardHeader>
+                <CardTitle>Habit Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={sortedData}>
+                        <XAxis
+                            dataKey="date"
+                            tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                            interval="preserveStartEnd"
+                            tick={{ fontSize: 12 }}
+                        />
+                        <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                        <Tooltip
+                            contentStyle={{ background: 'hsl(var(--card))', border: 'none', borderRadius: '6px' }}
+                            labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        />
+                        <Bar
+                            dataKey="count"
+                            fill="hsl(var(--primary))"
+                            barSize={20}
+                            radius={[4, 4, 0, 0]}
+                        />
+                    </BarChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
     );
 };
 

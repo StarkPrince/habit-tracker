@@ -1,11 +1,15 @@
 import Header from '@/components/Header'
 import Providers from '@/components/Providers'
+import { Metadata } from 'next'
 import { ReactNode } from 'react'
 import './globals.css'
 
-export const metadata = {
-  title: 'Habit Tracker',
-  description: 'Track and eliminate bad habits',
+export const metadata: Metadata = {
+  title: 'Chain Breaker',
+  description: 'Break bad habits and build good ones',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({

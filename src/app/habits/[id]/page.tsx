@@ -3,11 +3,14 @@
 import HabitBarChart from '@/components/HabitBarChart';
 import HabitHeatmap from '@/components/HabitHeatmap';
 import HabitLineChart from '@/components/HabitLineChart';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Habit } from '@/types';
 import { aggregateLogsByDay, DailyCount } from '@/utils/dataProcessing';
 import axios from 'axios';
+import { BarChart3, CalendarDays, LineChart } from "lucide-react";
 import { useEffect, useState } from 'react';
-import { Circles } from 'react-loader-spinner';
 
 const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
 {
@@ -46,48 +49,107 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
         fetchHabit();
     }, [id]);
 
-    if (loading)
+    if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <Circles color="#4fa94d" height={80} width={80} />
+            <div className="max-w-6xl mx-auto p-6">
+                <Skeleton className="h-8 w-2/3 mb-4" />
+                <Skeleton className="h-4 w-1/3 mb-6" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Skeleton className="h-64 w-full" />
+                    <Skeleton className="h-64 w-full" />
+                </div>
+                <Skeleton className="h-64 w-full mt-6" />
             </div>
         );
-    if (error) return <p className="text-red-500">{error}</p>;
-    if (!habit) return <p className="text-red-500">Habit not found.</p>;
+    }
+
+    if (error) return (
+        <Card className="max-w-6xl mx-auto p-6 bg-destructive/10">
+            <CardContent>
+                <p className="text-destructive">{error}</p>
+            </CardContent>
+        </Card>
+    );
+
+    if (!habit) return (
+        <Card className="max-w-6xl mx-auto p-6">
+            <CardContent>
+                <p className="text-muted-foreground">Habit not found.</p>
+            </CardContent>
+        </Card>
+    );
 
     return (
-        <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow">
-            <h1 className="text-2xl font-bold mb-4">{habit.name}</h1>
-            <p className="text-gray-600 mb-4">Created on: {new Date(habit.createdAt).toLocaleDateString()}</p>
-
-            <div className="mb-6">
-                <button
-                    onClick={() => logHabit(id)}
-                    className="text-blue-500 hover:underline"
-                >
-                    Log Occurrence
-                </button>
-            </div>
+        <div className="max-w-6xl mx-auto p-6 space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-3xl">{habit.name}</CardTitle>
+                    <CardDescription>
+                        Created on: {new Date(habit.createdAt).toLocaleDateString()}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button onClick={() => logHabit(id)} className="w-full sm:w-auto">
+                        Log Occurrence
+                    </Button>
+                </CardContent>
+            </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <HabitLineChart dailyCounts={dailyCounts} />
-                <HabitBarChart dailyCounts={dailyCounts} />
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center">
+                            <LineChart className="mr-2 h-5 w-5" />
+                            Habit Trends
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <HabitLineChart dailyCounts={dailyCounts} />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center">
+                            <BarChart3 className="mr-2 h-5 w-5" />
+                            Habit Performance
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <HabitBarChart dailyCounts={dailyCounts} />
+                    </CardContent>
+                </Card>
             </div>
-            <HabitHeatmap dailyCounts={dailyCounts} />
 
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center">
+                        <CalendarDays className="mr-2 h-5 w-5" />
+                        Habit Heatmap
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <HabitHeatmap dailyCounts={dailyCounts} />
+                </CardContent>
+            </Card>
 
-            <div className="mt-6">
-                <h3 className="text-lg font-semibold">Logs:</h3>
-                {habit.logs.length === 0 ? (
-                    <p>No logs yet.</p>
-                ) : (
-                    <ul className="list-disc list-inside">
-                        {habit.logs.map((log, index) => (
-                            <li key={index}>{new Date(log).toLocaleString()}</li>
-                        ))}
-                    </ul>
-                )}
-            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Logs</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {habit.logs.length === 0 ? (
+                        <p className="text-muted-foreground">No logs yet.</p>
+                    ) : (
+                        <ul className="space-y-2">
+                            {habit.logs.map((log, index) => (
+                                <li key={index} className="text-sm text-muted-foreground">
+                                    {new Date(log).toLocaleString()}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 };

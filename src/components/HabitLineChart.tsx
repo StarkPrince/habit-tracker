@@ -1,10 +1,7 @@
-// src/components/HabitLineChart.tsx
-import { CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
-import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { DailyCount } from '../utils/dataProcessing';
+'use client';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+import { DailyCount } from '@/utils/dataProcessing';
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 interface HabitLineChartProps
 {
@@ -13,56 +10,31 @@ interface HabitLineChartProps
 
 const HabitLineChart: React.FC<HabitLineChartProps> = ({ dailyCounts }) =>
 {
-    // Sort the data by date
     const sortedData = [...dailyCounts].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Prepare data for the chart
-    const labels = sortedData.map((dc) => dc.date);
-    const data = sortedData.map((dc) => dc.count);
-
-    const chartData = {
-        labels,
-        datasets: [
-            {
-                label: 'Occurrences',
-                data,
-                fill: false,
-                borderColor: 'rgba(75,192,192,1)',
-                tension: 0.1,
-            },
-        ],
-    };
-
-    const options = {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top' as const,
-            },
-            title: {
-                display: true,
-                text: 'Habit Trends Over Time',
-            },
-        },
-        scales: {
-            x: {
-                ticks: {
-                    maxTicksLimit: 10, // Adjust as needed
-                    autoSkip: true,
-                },
-            },
-            y: {
-                beginAtZero: true,
-                precision: 0,
-            },
-        },
-    };
-
     return (
-        <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-2">Habit Trends</h3>
-            <Line data={chartData} options={options} />
-        </div>
+        <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={sortedData}>
+                <XAxis
+                    dataKey="date"
+                    tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                    interval="preserveStartEnd"
+                    tick={{ fontSize: 12 }}
+                />
+                <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                <Tooltip
+                    contentStyle={{ background: 'hsl(var(--card))', border: 'none', borderRadius: '6px' }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                />
+                <Line
+                    type="monotone"
+                    dataKey="count"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    dot={{ fill: 'hsl(var(--primary))', r: 4 }}
+                />
+            </LineChart>
+        </ResponsiveContainer>
     );
 };
 

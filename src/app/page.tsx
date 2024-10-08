@@ -1,8 +1,11 @@
-// src/app/page.tsx
 'use client'
 
 import ProtectedRoute from '@/components/ProtectedRoute'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import axios from 'axios'
+import { Calendar, Info, Plus } from "lucide-react"
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -56,33 +59,72 @@ function HomeContent()
     }
   }
 
-  if (loading) return <p>Loading...</p>
-  if (error) return <p className="text-red-500">{error}</p>
-
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Bad Habits</h2>
-      {habits.length === 0 ? (
-        <p>No habits found. <Link href="/create" className="text-blue-500">Create one!</Link></p>
+    <div className="container mx-auto px-4 py-8">
+      <h2 className="text-3xl font-bold mb-6 text-primary">Bad Habits</h2>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, index) => (
+            <Card key={index} className="w-full">
+              <CardHeader>
+                <Skeleton className="h-4 w-2/3" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : error ? (
+        <Card className="w-full bg-destructive/10">
+          <CardContent className="pt-6">
+            <p className="text-destructive">{error}</p>
+          </CardContent>
+        </Card>
+      ) : habits.length === 0 ? (
+        <Card className="w-full">
+          <CardContent className="pt-6 text-center">
+            <p className="text-muted-foreground mb-4">No habits found.</p>
+            <Link href="/create">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Create a habit
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {habits.map((habit) => (
-            <div key={habit._id} className="bg-white p-4 rounded shadow">
-              <h3 className="text-lg font-bold">{habit.name}</h3>
-              <p className="text-sm text-gray-600">Created on: {new Date(habit.createdAt).toLocaleDateString()}</p>
-              <div className="mt-2 flex space-x-2">
-                <Link href={`/habits/${habit._id}`} className="text-blue-500 hover:underline">
-                  Details
+            <Card key={habit._id} className="w-full">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold">{habit.name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground flex items-center">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Created on: {new Date(habit.createdAt).toLocaleDateString()}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground flex items-center">
+                  <Info className="mr-2 h-4 w-4" />
+                  Logs: {habit.logs.length}
+                </p>
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Link href={`/habits/${habit._id}`}>
+                  <Button variant="outline" size="sm">
+                    Details
+                  </Button>
                 </Link>
-                <button
+                <Button
                   onClick={() => logHabit(habit._id)}
-                  className="text-red-500 hover:underline"
+                  variant="destructive"
+                  size="sm"
                 >
                   Did it again!
-                </button>
-              </div>
-              <p className="mt-2 text-sm text-gray-700">Logs: {habit.logs.length}</p>
-            </div>
+                </Button>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       )}

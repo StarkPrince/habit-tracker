@@ -1,9 +1,10 @@
-// src/components/HabitHeatmap.tsx
+'use client';
+
+import { DailyCount } from '@/utils/dataProcessing';
 import { subDays } from 'date-fns';
 import React from 'react';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
-import { DailyCount } from '../utils/dataProcessing';
 
 interface HabitHeatmapProps
 {
@@ -12,19 +13,16 @@ interface HabitHeatmapProps
 
 const HabitHeatmap: React.FC<HabitHeatmapProps> = ({ dailyCounts }) =>
 {
-    // Define the start date (e.g., 1 year ago)
     const startDate = subDays(new Date(), 365);
     const endDate = new Date();
 
-    // Map dailyCounts to the format expected by react-calendar-heatmap
     const heatmapData = dailyCounts.map((dc) => ({
         date: dc.date,
         count: dc.count,
     }));
 
     return (
-        <div>
-            <h3 className="text-lg font-semibold mb-2">Habit Heatmap</h3>
+        <div className="w-full overflow-x-auto">
             <CalendarHeatmap
                 startDate={startDate}
                 endDate={endDate}
@@ -34,28 +32,25 @@ const HabitHeatmap: React.FC<HabitHeatmapProps> = ({ dailyCounts }) =>
                     if (!value) {
                         return 'color-empty';
                     }
-                    if (value.count >= 5) {
-                        return 'color-scale-4';
-                    }
-                    if (value.count >= 3) {
-                        return 'color-scale-3';
-                    }
-                    if (value.count >= 1) {
-                        return 'color-scale-2';
-                    }
-                    return 'color-scale-1';
+                    return `color-scale-${Math.min(value.count, 4)}`;
                 }}
-                tooltipDataAttrs={(value) =>
+                tooltipDataAttrs={(value: any) =>
                 {
-                    if (value.date) {
-                        return {
-                            'data-tip': `${value.date}: ${value.count} time(s)`,
-                        };
+                    if (!value || !value.date) {
+                        return {};
                     }
-                    return {};
+                    return {
+                        'data-tip': `${value.date}: ${value.count} time(s)`,
+                    };
                 }}
                 showWeekdayLabels={true}
             />
+            <style jsx global>{`
+        .react-calendar-heatmap .color-scale-1 { fill: hsl(var(--primary) / 0.2); }
+        .react-calendar-heatmap .color-scale-2 { fill: hsl(var(--primary) / 0.4); }
+        .react-calendar-heatmap .color-scale-3 { fill: hsl(var(--primary) / 0.6); }
+        .react-calendar-heatmap .color-scale-4 { fill: hsl(var(--primary) / 0.8); }
+      `}</style>
         </div>
     );
 };

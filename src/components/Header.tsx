@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from "@/components/ui/button"
+import { Unlink } from "lucide-react"
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import React from 'react'
@@ -9,35 +11,43 @@ const Header: React.FC = () =>
     const { data: session } = useSession()
 
     return (
-        <header className="bg-blue-600 text-white p-4">
-            <div className="container mx-auto flex justify-between">
-                <Link href="/">
-                    <h1 className="text-2xl font-bold">Chain Breaker</h1>
+        <header className="bg-primary text-primary-foreground">
+            <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+                <Link href="/" className="text-2xl font-bold hover:opacity-80 transition-opacity flex items-center">
+                    <Unlink className="mr-2 h-6 w-6" />
+                    Chain Breaker
                 </Link>
-                <div className="flex space-x-4">
-                    {session ? (
-                        <>
-                            <Link href="/create" className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-700 transition">
-                                Create Habit
-                            </Link>
-                            <button
-                                onClick={() => signOut()}
-                                className="bg-red-500 px-3 py-1 rounded hover:bg-red-700 transition"
-                            >
-                                Logout
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <Link href="/login" className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-700 transition">
-                                Login
-                            </Link>
-                            <Link href="/register" className="bg-green-500 px-3 py-1 rounded hover:bg-green-700 transition">
-                                Register
-                            </Link>
-                        </>
-                    )}
-                </div>
+                <nav>
+                    <ul className="flex space-x-4">
+                        {session ? (
+                            <>
+                                <li>
+                                    <Button asChild variant="secondary">
+                                        <Link href="/create">Create Habit</Link>
+                                    </Button>
+                                </li>
+                                <li>
+                                    <Button variant="destructive" onClick={() => signOut()}>
+                                        Logout
+                                    </Button>
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li>
+                                    <Button asChild variant="secondary">
+                                        <Link href="/login">Login</Link>
+                                    </Button>
+                                </li>
+                                <li>
+                                    <Button asChild variant="default">
+                                        <Link href="/register">Register</Link>
+                                    </Button>
+                                </li>
+                            </>
+                        )}
+                    </ul>
+                </nav>
             </div>
         </header>
     )
