@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { DailyCount } from '@/utils/dataProcessing';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -14,10 +14,7 @@ const HabitBarChart: React.FC<HabitBarChartProps> = ({ dailyCounts }) =>
     const sortedData = [...dailyCounts].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Habit Performance</CardTitle>
-            </CardHeader>
+        <ResponsiveContainer width="100%" height={300}>
             <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={sortedData}>
@@ -41,7 +38,7 @@ const HabitBarChart: React.FC<HabitBarChartProps> = ({ dailyCounts }) =>
                     </BarChart>
                 </ResponsiveContainer>
             </CardContent>
-        </Card>
+        </ResponsiveContainer>
     );
 };
 

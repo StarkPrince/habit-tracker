@@ -1,5 +1,6 @@
 'use client';
 
+import AdvancedHabitAnalytics from '@/components/AdvancedAnalytics';
 import HabitBarChart from '@/components/HabitBarChart';
 import HabitHeatmap from '@/components/HabitHeatmap';
 import HabitLineChart from '@/components/HabitLineChart';
@@ -10,7 +11,7 @@ import { Habit } from '@/types';
 import { aggregateLogsByDay, DailyCount } from '@/utils/dataProcessing';
 import axios from 'axios';
 import { BarChart3, CalendarDays, LineChart } from "lucide-react";
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
 {
@@ -20,7 +21,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
 
-    const fetchHabit = async () =>
+    const fetchHabit = useCallback(async () =>
     {
         try {
             const response = await axios.get(`/api/habits/${id}`);
@@ -32,7 +33,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
     const logHabit = async (id: string) =>
     {
@@ -131,6 +132,8 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                     <HabitHeatmap dailyCounts={dailyCounts} />
                 </CardContent>
             </Card>
+
+            <AdvancedHabitAnalytics habit={habit} />
 
             <Card>
                 <CardHeader>

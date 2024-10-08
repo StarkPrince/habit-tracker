@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+
 export default function Login()
 {
     const [email, setEmail] = useState<string>('')
@@ -20,24 +21,31 @@ export default function Login()
 
     const handleSubmit = async (e: React.FormEvent) =>
     {
-        e.preventDefault()
-        setError('')
-        setIsLoading(true)
+        e.preventDefault();
+        setError('');
+        setIsLoading(true);
 
-        const res = await signIn('credentials', {
-            redirect: false,
-            email,
-            password,
-        })
+        try {
+            const res = await signIn('credentials', {
+                redirect: false,
+                email,
+                password,
+            });
 
-        setIsLoading(false)
-
-        if (res?.error) {
-            setError(res.error)
-        } else {
-            router.push('/')
+            if (res?.error) {
+                setError(res.error);
+                setIsLoading(false);
+            } else {
+                router.push('/');
+            }
+        } catch (error) {
+            console.log(error);
+            setError('An unexpected error occurred');
+            setIsLoading(false);
         }
-    }
+    };
+
+
 
     return (
         <div className="container mx-auto flex items-center justify-center min-h-screen p-4">
@@ -82,7 +90,7 @@ export default function Login()
                 </CardContent>
                 <CardFooter className="flex justify-center">
                     <p className="text-sm text-muted-foreground">
-                        Don't have an account?{' '}
+                        Dont have an account?{' '}
                         <Link href="/register" className="text-primary hover:underline">
                             Register here
                         </Link>
