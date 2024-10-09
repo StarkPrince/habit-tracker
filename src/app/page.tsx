@@ -4,6 +4,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import WorldMapUserDistribution from '@/components/WorldMap'
 import axios from 'axios'
 import { Calendar, Info, Plus } from "lucide-react"
 import Link from 'next/link'
@@ -128,6 +129,12 @@ function HomeContent()
           ))}
         </div>
       )}
+
+      <Card className="w-full mt-72">
+        <CardContent className="p-4">
+          <WorldMapUserDistribution />
+        </CardContent>
+      </Card>
     </div>
   )
 }

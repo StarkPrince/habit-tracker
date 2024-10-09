@@ -121,6 +121,8 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                 </Card>
             </div>
 
+
+
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">
