@@ -222,7 +222,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                                                     diffColor = 'text-gray-700'; // No comparison for first difference
                                                 } else {
                                                     const prevDifference =
-                                                        // @ts-ignore
+                                                        // @ts-expect-error
                                                         new Date(habit.logs[index - 1]) - new Date(habit.logs[index - 2]);
 
                                                     diffColor = difference > prevDifference ? 'text-green-500' : 'text-red-500';
