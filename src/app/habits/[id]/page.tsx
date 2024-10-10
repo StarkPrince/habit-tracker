@@ -14,6 +14,14 @@ import axios from 'axios';
 import { BarChart3, CalendarDays, LineChart, PieChart, ScatterChart } from "lucide-react";
 import { useCallback, useEffect, useState } from 'react';
 
+interface LogEntry
+{
+    day: string;
+    date: string;
+    time: string;
+    difference: string;
+    diffColor: string;
+}
 const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
 {
     const { id } = params;
@@ -44,6 +52,34 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
         } catch (err: any) {
             alert(err.response?.data?.error || 'Failed to log habit')
         }
+    }
+
+    const calculateDifferences = (habit: Habit) =>
+    {
+        return habit.logs.map((log, index, logs) =>
+        {
+            let diffColor = 'text-gray-700'; // Default color for the first item
+            let difference = '-'; // Default text when there's no calculable difference
+
+            if (index > 0) {
+                const currentLogDate = new Date(log);
+                const previousLogDate = new Date(logs[index - 1]);
+                const diffInMinutes = (currentLogDate.getTime() - previousLogDate.getTime()) / 60000;
+
+                if (index === 1) {
+                    diffColor = 'text-gray-700'; // No previous comparison for the first difference
+                } else if (logs[index - 2]) { // Ensure there's a second previous log to compare against
+                    const secondPreviousLogDate = new Date(logs[index - 2]);
+                    const prevDifference = (previousLogDate.getTime() - secondPreviousLogDate.getTime()) / 60000;
+
+                    diffColor = diffInMinutes > prevDifference ? 'text-green-500' : 'text-red-500';
+                }
+
+                difference = `${Math.abs(diffInMinutes)} mins`;
+            }
+
+            return { difference, diffColor };
+        });
     }
 
     useEffect(() =>
@@ -80,6 +116,52 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
             </CardContent>
         </Card>
     );
+    const processLogs = (logs: string[]): LogEntry[] =>
+    {
+        return logs.map((log, index) =>
+        {
+            const currentDate = new Date(log);
+            const day = currentDate.toLocaleDateString(undefined, { weekday: 'long' });
+            const date = currentDate.toLocaleDateString();
+            const time = currentDate.toLocaleTimeString(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+            });
+
+            let difference: string = '-';
+            let diffColor: string = 'text-gray-700'; // Default color
+
+            if (index > 0) {
+                const previousDate = new Date(logs[index - 1]);
+                const diffInMilliseconds = currentDate.getTime() - previousDate.getTime();
+
+                if (!isNaN(diffInMilliseconds)) {
+                    const diffInMinutes = Math.round(diffInMilliseconds / 60000);
+                    difference = `${Math.abs(diffInMinutes)} mins`;
+
+                    if (index > 1) {
+                        const secondPreviousDate = new Date(logs[index - 2]);
+                        const prevDifferenceMs = previousDate.getTime() - secondPreviousDate.getTime();
+
+                        if (!isNaN(prevDifferenceMs)) {
+                            const prevDifferenceMinutes = Math.round(prevDifferenceMs / 60000);
+                            diffColor = diffInMinutes > prevDifferenceMinutes ? 'text-green-500' : 'text-red-500';
+                        }
+                    }
+                }
+            }
+
+            return {
+                day: `${day}, ${date}`,
+                time,
+                difference,
+                diffColor,
+            } as LogEntry;
+        });
+    };
+
+    const logEntries: LogEntry[] = processLogs(habit.logs);
 
     return (
         <div className="max-w-6xl mx-auto p-6 space-y-6">
@@ -194,63 +276,21 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {habit.logs.map((log, index) =>
-                                    {
-                                        const currentDate: any = new Date(log);
-                                        const day = currentDate.toLocaleDateString(undefined, { weekday: 'long' });
-                                        const date = currentDate.toLocaleDateString();
-                                        const time = currentDate.toLocaleTimeString(undefined, {
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            second: '2-digit',
-                                        });
-
-                                        // Calculate the difference from the previous log
-                                        let difference: any = null;
-                                        let diffColor = 'text-gray-700'; // Default color
-
-                                        if (index > 0) {
-                                            const previousDate: any = new Date(habit.logs[index - 1]);
-                                            difference = currentDate - previousDate; // difference in milliseconds
-
-                                            if (!isNaN(difference)) {
-                                                // Calculate difference in minutes
-                                                const diffInMinutes = Math.round(difference / 60000);
-
-                                                // Determine color for difference based on comparison with previous difference
-                                                if (index === 1) {
-                                                    diffColor = 'text-gray-700'; // No comparison for first difference
-                                                } else {
-                                                    const prevDifference =
-                                                        // @ts-expect-error
-                                                        new Date(habit.logs[index - 1]) - new Date(habit.logs[index - 2]);
-
-                                                    diffColor = difference > prevDifference ? 'text-green-500' : 'text-red-500';
-                                                }
-
-                                                difference = `${diffInMinutes} mins`;
-                                            } else {
-                                                difference = '-';
-                                            }
-                                        }
-
-                                        return (
-                                            <tr key={index}>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{`${day}, ${date}`}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{time}</td>
-                                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${diffColor}`}>
-                                                    {difference === null ? '-' : difference}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
+                                    {logEntries.map((entry, index) => (
+                                        <tr key={index}>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{entry.day}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{entry.time}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${entry.diffColor}`}>
+                                                {entry.difference}
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
                     )}
                 </CardContent>
             </Card>
-
 
         </div>
     );
