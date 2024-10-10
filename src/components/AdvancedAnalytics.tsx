@@ -11,23 +11,9 @@ interface AdvancedHabitAnalyticsProps
 
 const AdvancedHabitAnalytics: React.FC<AdvancedHabitAnalyticsProps> = ({ habit }) =>
 {
-    // Process data for heatmap
-    // const heatmapData = processHeatmapData(habit.logs);
-
-    // Process data for day of week distribution
     const dayDistributionData = processDayDistributionData(habit.logs);
     return (
         <div className="space-y-6">
-            {/* <Card>
-                <CardHeader>
-                    <CardTitle>Habit Occurrence Heatmap</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="w-full h-64">
-                        <HeatMap data={heatmapData} />
-                    </div>
-                </CardContent>
-            </Card> */}
 
             <Card>
                 <CardHeader>
@@ -59,65 +45,6 @@ const AdvancedHabitAnalytics: React.FC<AdvancedHabitAnalyticsProps> = ({ habit }
 };
 
 
-// interface HeatMapProps
-// {
-//     data: number[][];
-// }
-
-// const HeatMap: React.FC<HeatMapProps> = ({ data }) => 
-// {
-//     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-//     const hours = Array.from({ length: 24 }, (_, i) => i);
-
-//     const maxValue = Math.max(...data.flat());
-
-//     return (
-//         <Card className="w-full">
-//             <CardHeader>
-//                 <CardTitle>Weekly Habit Heatmap</CardTitle>
-//             </CardHeader>
-//             <CardContent>
-//                 <div className="w-full overflow-x-auto">
-//                     <div className="min-w-[600px]">
-//                         <div className="flex">
-//                             <div className="w-10" /> {/* Spacer for day labels */}
-//                             <div className="flex-grow grid grid-cols-24 gap-px">
-//                                 {hours.map(hour => (
-//                                     <div key={hour} className="text-center text-xs text-muted-foreground">
-//                                         {hour}
-//                                     </div>
-//                                 ))}
-//                             </div>
-//                         </div>
-//                         <div className="flex">
-//                             <div className="w-10 flex flex-col justify-between text-xs text-muted-foreground">
-//                                 {days.map(day => (
-//                                     <div key={day} className="h-8 flex items-center">
-//                                         {day}
-//                                     </div>
-//                                 ))}
-//                             </div>
-//                             <div className="flex-grow grid grid-cols-24 grid-rows-7 gap-px">
-//                                 {data.flatMap((row, i) =>
-//                                     row.map((value, j) => (
-//                                         <div
-//                                             key={`${i}-${j}`}
-//                                             className="w-full h-8"
-//                                             style={{
-//                                                 backgroundColor: `hsl(var(--primary) / ${value / maxValue})`,
-//                                             }}
-//                                             title={`${days[i]} ${hours[j]}:00 - ${value} occurrences`}
-//                                         />
-//                                     ))
-//                                 )}
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </CardContent>
-//         </Card>
-//     );
-// }
 
 function processHeatmapData(logs: string[]): number[][]
 {

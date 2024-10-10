@@ -1,16 +1,17 @@
 'use client';
 
-import AdvancedHabitAnalytics from '@/components/AdvancedAnalytics';
 import HabitBarChart from '@/components/HabitBarChart';
 import HabitHeatmap from '@/components/HabitHeatmap';
 import HabitLineChart from '@/components/HabitLineChart';
+import HabitPieChartByDay from '@/components/HabitPieChartByDay';
+import HabitPieChartByHour from '@/components/HabitPieChartByHour';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Habit } from '@/types';
 import { aggregateLogsByDay, DailyCount } from '@/utils/dataProcessing';
 import axios from 'axios';
-import { BarChart3, CalendarDays, LineChart } from "lucide-react";
+import { BarChart3, CalendarDays, LineChart, PieChart, ScatterChart } from "lucide-react";
 import { useCallback, useEffect, useState } from 'react';
 
 const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
@@ -135,7 +136,30 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                 </CardContent>
             </Card>
 
-            <AdvancedHabitAnalytics habit={habit} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center">
+                            <PieChart className="mr-2 h-5 w-5" />
+                            Habit By Day
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <HabitPieChartByDay habit={habit} />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center">
+                            <ScatterChart className="mr-2 h-5 w-5" />
+                            Habit By Hour
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <HabitPieChartByHour habit={habit} />
+                    </CardContent>
+                </Card>
+            </div>
 
             <Card>
                 <CardHeader>
@@ -145,16 +169,89 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                     {habit.logs.length === 0 ? (
                         <p className="text-muted-foreground">No logs yet.</p>
                     ) : (
-                        <ul className="space-y-2">
-                            {habit.logs.map((log, index) => (
-                                <li key={index} className="text-sm text-muted-foreground">
-                                    {new Date(log).toLocaleString()}
-                                </li>
-                            ))}
-                        </ul>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >
+                                            Day
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >
+                                            Time
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >
+                                            Difference
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {habit.logs.map((log, index) =>
+                                    {
+                                        const currentDate: any = new Date(log);
+                                        const day = currentDate.toLocaleDateString(undefined, { weekday: 'long' });
+                                        const date = currentDate.toLocaleDateString();
+                                        const time = currentDate.toLocaleTimeString(undefined, {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            second: '2-digit',
+                                        });
+
+                                        // Calculate the difference from the previous log
+                                        let difference: any = null;
+                                        let diffColor = 'text-gray-700'; // Default color
+
+                                        if (index > 0) {
+                                            const previousDate: any = new Date(habit.logs[index - 1]);
+                                            difference = currentDate - previousDate; // difference in milliseconds
+
+                                            if (!isNaN(difference)) {
+                                                // Calculate difference in minutes
+                                                const diffInMinutes = Math.round(difference / 60000);
+
+                                                // Determine color for difference based on comparison with previous difference
+                                                if (index === 1) {
+                                                    diffColor = 'text-gray-700'; // No comparison for first difference
+                                                } else {
+                                                    const prevDifference =
+                                                        // @ts-ignore
+                                                        new Date(habit.logs[index - 1]) - new Date(habit.logs[index - 2]);
+
+                                                    diffColor = difference > prevDifference ? 'text-green-500' : 'text-red-500';
+                                                }
+
+                                                difference = `${diffInMinutes} mins`;
+                                            } else {
+                                                difference = '-';
+                                            }
+                                        }
+
+                                        return (
+                                            <tr key={index}>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{`${day}, ${date}`}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{time}</td>
+                                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${diffColor}`}>
+                                                    {difference === null ? '-' : difference}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </CardContent>
             </Card>
+
+
         </div>
     );
 };
