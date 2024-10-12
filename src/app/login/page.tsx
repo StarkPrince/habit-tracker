@@ -39,7 +39,6 @@ export default function Login()
                 router.push('/');
             }
         } catch (error) {
-            console.log(error);
             setError('An unexpected error occurred');
             setIsLoading(false);
         }

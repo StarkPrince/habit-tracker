@@ -44,9 +44,10 @@ const HabitChartByHour: React.FC<HabitChartByHourProps> = ({ habit }) =>
 
     const CustomTooltip = ({ active, payload }: any) =>
     {
+        console.log(active, payload)
         if (active && payload && payload.length) {
             const hourFormatted = formatHour(payload[0].payload.hour);
-            const frequency = payload[0].value;
+            const frequency = payload[0].payload.frequency;
             return (
                 <div className="bg-white p-2 border border-gray-300 rounded shadow">
                     <p className="text-sm text-gray-700">{`${hourFormatted}: ${frequency}`}</p>

@@ -19,7 +19,6 @@ export async function getUserId(req: NextRequest): Promise<string | null> {
       };
       return decoded.id;
     } catch (error: any) {
-      console.log(error);
       return null;
     }
   }
