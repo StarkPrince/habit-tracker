@@ -17,7 +17,6 @@ import { aggregateLogsByDay, DailyCount } from '@/utils/dataProcessing';
 import axios from 'axios';
 import { BarChart3, BoxIcon, CalendarDays, LineChart, List, Logs, LucideAreaChart, Map, PieChart, ScatterChart } from "lucide-react";
 import { useCallback, useEffect, useState } from 'react';
-
 interface LogEntry
 {
     day: string;
@@ -33,6 +32,36 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
     const [dailyCounts, setDailyCounts] = useState<DailyCount[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
+    const [time, setTime] = useState(() =>
+    {
+        const now = new Date();
+        now.setMinutes(Math.floor(now.getMinutes() / 15) * 15);
+        now.setSeconds(0, 0);
+        return now.toTimeString().substring(0, 5);
+    });
+    const [date, setDate] = useState(() =>
+    {
+        const now = new Date();
+        return now.toISOString().substring(0, 10); // Default to current date
+    });
+
+
+    const handleTimeChange = (event) =>
+    {
+        setTime(event.target.value);
+    };
+
+    const generateTimeOptions = () =>
+    {
+        const times: Date[] = [];
+        const start = new Date();
+        start.setHours(0, 0, 0, 0); // Start of the day
+        for (let i = 0; i < 24 * 4; i++) {
+            const optionTime = new Date(start.getTime() + i * 15 * 60 * 1000);
+            times.push(optionTime);
+        }
+        return times;
+    };
 
     const fetchHabit = useCallback(async () =>
     {
@@ -47,11 +76,15 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
             setLoading(false);
         }
     }, [id]);
-
     const logHabit = async (id: string) =>
     {
+        const combinedDateTime = new Date(`${date}T${time}:00`);
         try {
-            await axios.post(`/api/habits/${id}/log`)
+            if (!time) {
+                alert('Please select a time');
+                return;
+            }
+            await axios.post(`/api/habits/${id}/log`, { combinedDateTime });
             fetchHabit()
         } catch (err: any) {
             alert(err.response?.data?.error || 'Failed to log habit')
@@ -177,12 +210,32 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button onClick={() => logHabit(id)} className="w-full sm:w-auto">
-                        Log Occurrence
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-4">
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            className="flex-grow sm:flex-grow-0 h-9 rounded-lg border bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-shadow focus:border-ring focus:ring-2 focus:ring-ring/30 focus:ring-offset-2"
+                            placeholder='YYYY-MM-DD'
+                        />
+                        <select
+                            value={time}
+                            onChange={(e) => setTime(e.target.value)}
+                            className="flex-grow sm:flex-grow-0 h-9 rounded-lg border bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-shadow focus:border-ring focus:ring-2 focus:ring-ring/30 focus:ring-offset-2"
+                            title='HH:MM'
+                        >
+                            {generateTimeOptions().map((option) => (
+                                <option key={option.toISOString()} value={option.toTimeString().substring(0, 5)}>
+                                    {option.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </option>
+                            ))}
+                        </select>
+                        <Button onClick={() => logHabit(id)} className="h-9">
+                            Log Occurrence
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
-
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">

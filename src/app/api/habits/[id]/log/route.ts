@@ -10,12 +10,14 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   const userId = await getUserId(request);
+  const { combinedDateTime } = await request.json();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const { id } = params;
+    console.log(combinedDateTime);
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid Habit ID" }, { status: 400 });
@@ -29,7 +31,7 @@ export async function POST(
       return NextResponse.json({ error: "Habit not found" }, { status: 404 });
     }
 
-    habit.logs.push(new Date());
+    habit.logs.push(new Date(combinedDateTime));
     await habit.save();
 
     return NextResponse.json(habit, { status: 200 });

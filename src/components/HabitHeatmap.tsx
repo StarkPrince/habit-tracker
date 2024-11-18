@@ -29,10 +29,12 @@ const HabitHeatmap: React.FC<HabitHeatmapProps> = ({ dailyCounts }) =>
                 values={heatmapData}
                 classForValue={(value) =>
                 {
-                    if (!value) {
+                    if (!value || value.count === 0) {
                         return 'color-empty';
                     }
-                    return `color-scale-${Math.min(value.count, 4)}`;
+                    console.log("value", value.count);
+                    const logValue = Math.min(Math.floor(Math.log2(value.count + 1)), 6);
+                    return `color-scale-${logValue}`;
                 }}
                 tooltipDataAttrs={(value: any) =>
                 {
@@ -46,11 +48,15 @@ const HabitHeatmap: React.FC<HabitHeatmapProps> = ({ dailyCounts }) =>
                 showWeekdayLabels={true}
             />
             <style jsx global>{`
-        .react-calendar-heatmap .color-scale-1 { fill: hsl(var(--primary) / 0.2); }
-        .react-calendar-heatmap .color-scale-2 { fill: hsl(var(--primary) / 0.4); }
-        .react-calendar-heatmap .color-scale-3 { fill: hsl(var(--primary) / 0.6); }
-        .react-calendar-heatmap .color-scale-4 { fill: hsl(var(--primary) / 0.8); }
-      `}</style>
+                .react-calendar-heatmap .color-scale-0 { fill: hsl(var(--primary) / 0.0); }
+                .react-calendar-heatmap .color-scale-0 { fill: hsl(var(--primary) / 0.142); }
+                .react-calendar-heatmap .color-scale-1 { fill: hsl(var(--primary) / 0.285); }
+                .react-calendar-heatmap .color-scale-2 { fill: hsl(var(--primary) / 0.428); }
+                .react-calendar-heatmap .color-scale-3 { fill: hsl(var(--primary) / 0.571); }
+                .react-calendar-heatmap .color-scale-4 { fill: hsl(var(--primary) / 0.714); }
+                .react-calendar-heatmap .color-scale-5 { fill: hsl(var(--primary) / 0.857); }
+                .react-calendar-heatmap .color-scale-6 { fill: hsl(var(--primary) / 1); }
+            `}</style>
         </div>
     );
 };
