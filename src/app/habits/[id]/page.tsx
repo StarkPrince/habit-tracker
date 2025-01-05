@@ -3,19 +3,19 @@
 import HabitAreaBump from '@/components/HabitAreaBump';
 import HabitBarChart from '@/components/HabitBarChart';
 import HabitBoxPlot from '@/components/HabitBoxPlot';
-import HabitBullet from '@/components/HabitBulltet';
+// import HabitBullet from '@/components/HabitBulltet';
 import HabitHeatmap from '@/components/HabitHeatmap';
-import HabitHeatmapByMonthAndYear from '@/components/HabitHeatmapByMonthAndYear';
 import HabitLineChart from '@/components/HabitLineChart';
 import HabitPieChartByDay from '@/components/HabitPieChartByDay';
 import HabitPieChartByHour from '@/components/HabitScatterPlotByHour';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { logHabitGlobal } from '@/lib/utils';
 import { Habit } from '@/types';
 import { aggregateLogsByDay, DailyCount } from '@/utils/dataProcessing';
 import axios from 'axios';
-import { BarChart3, BoxIcon, CalendarDays, LineChart, List, Logs, LucideAreaChart, Map, PieChart, ScatterChart } from "lucide-react";
+import { BarChart3, BoxIcon, CalendarDays, LineChart, Logs, LucideAreaChart, PieChart, ScatterChart } from "lucide-react";
 import { useCallback, useEffect, useState } from 'react';
 interface LogEntry
 {
@@ -76,48 +76,16 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
             setLoading(false);
         }
     }, [id]);
-    const logHabit = async (id: string) =>
+    const logHabit = async (id: string, logdate: string, logtime: string) =>
     {
-        const combinedDateTime = new Date(`${date}T${time}:00`);
         try {
-            if (!time) {
-                alert('Please select a time');
-                return;
-            }
-            await axios.post(`/api/habits/${id}/log`, { combinedDateTime });
+            logHabitGlobal(id, logdate, logtime)
             fetchHabit()
         } catch (err: any) {
             alert(err.response?.data?.error || 'Failed to log habit')
         }
     }
 
-    const calculateDifferences = (habit: Habit) =>
-    {
-        return habit.logs.map((log, index, logs) =>
-        {
-            let diffColor = 'text-gray-700'; // Default color for the first item
-            let difference = '-'; // Default text when there's no calculable difference
-
-            if (index > 0) {
-                const currentLogDate = new Date(log);
-                const previousLogDate = new Date(logs[index - 1]);
-                const diffInMinutes = (currentLogDate.getTime() - previousLogDate.getTime()) / 60000;
-
-                if (index === 1) {
-                    diffColor = 'text-gray-700'; // No previous comparison for the first difference
-                } else if (logs[index - 2]) { // Ensure there's a second previous log to compare against
-                    const secondPreviousLogDate = new Date(logs[index - 2]);
-                    const prevDifference = (previousLogDate.getTime() - secondPreviousLogDate.getTime()) / 60000;
-
-                    diffColor = diffInMinutes > prevDifference ? 'text-green-500' : 'text-red-500';
-                }
-
-                difference = `${Math.abs(diffInMinutes)} mins`;
-            }
-
-            return { difference, diffColor };
-        });
-    }
 
     useEffect(() =>
     {
@@ -230,7 +198,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                                 </option>
                             ))}
                         </select>
-                        <Button onClick={() => logHabit(id)} className="h-9">
+                        <Button onClick={() => logHabit(id, date, time)} className="h-9">
                             Log Occurrence
                         </Button>
                     </div>
@@ -258,7 +226,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                     <HabitHeatmap dailyCounts={dailyCounts} />
                 </CardContent>
             </Card>
-            <Card>
+            {/* <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">
                         <Map className="mr-2 h-5 w-5" />
@@ -268,7 +236,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                 <CardContent>
                     <HabitHeatmapByMonthAndYear habit={habit} />
                 </CardContent>
-            </Card>
+            </Card> */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">
@@ -314,7 +282,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                     <HabitPieChartByDay habit={habit} />
                 </CardContent>
             </Card>
-            <Card>
+            {/* <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">
                         <List className="mr-2 h-5 w-5" />
@@ -324,7 +292,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                 <CardContent>
                     <HabitBullet habit={habit} />
                 </CardContent>
-            </Card>
+            </Card> */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">

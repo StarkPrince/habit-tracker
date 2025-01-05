@@ -5,6 +5,7 @@ import { Unlink } from "lucide-react"
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import React from 'react'
+import { ModeToggle } from "./ui/mode-toggle"
 
 const Header: React.FC = () =>
 {
@@ -19,6 +20,7 @@ const Header: React.FC = () =>
                 </Link>
                 <nav>
                     <ul className="flex space-x-4">
+                        <ModeToggle />
                         {session ? (
                             <>
                                 <li>

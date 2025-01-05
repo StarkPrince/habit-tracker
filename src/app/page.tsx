@@ -4,7 +4,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import WorldMapUserDistribution from '@/components/WorldMap'
+import { logHabitGlobal } from '@/lib/utils'
 import axios from 'axios'
 import { Calendar, Info, Plus } from "lucide-react"
 import Link from 'next/link'
@@ -45,25 +45,27 @@ function HomeContent()
     }
   }
 
-  useEffect(() =>
-  {
-    fetchHabits()
-  }, [])
 
   const logHabit = async (id: string) =>
   {
     try {
-      await axios.post(`/api/habits/${id}/log`)
+      logHabitGlobal(id, new Date().toISOString().substring(0, 10), new Date().toTimeString().substring(0, 5))
       fetchHabits()
     } catch (err: any) {
       alert(err.response?.data?.error || 'Failed to log habit')
     }
   }
 
+  useEffect(() =>
+  {
+    fetchHabits()
+  }, [logHabit])
+
+
   return (
     <>
       <div className="container mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold mb-6 text-primary">Bad Habits</h2>
+        <h2 className="text-3xl font-bold mb-6 text-primary">Track Your Habits</h2>
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, index) => (
@@ -132,11 +134,11 @@ function HomeContent()
         )}
       </div>
       {/* on small device make the width full screen */}
-      <Card className="w-full mt-72 sm:w-full">
+      {/* <Card className="w-full mt-72 sm:w-full">
         <CardContent className="my-2 p-0">
           <WorldMapUserDistribution />
         </CardContent>
-      </Card>
+      </Card> */}
     </>
   )
 }
