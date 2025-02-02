@@ -1,7 +1,8 @@
 // install (please try to align the version of installed @nivo packages)
 // yarn add @nivo/bump
+import { NivoWrapper } from '@/components/ui/nivo-wrapper';
 import { ResponsiveAreaBump } from '@nivo/bump';
-import { ResponsiveContainer } from 'recharts';
+
 // Define the structure for individual data points
 type DataPoint = {
     x: string | number;
@@ -10,6 +11,32 @@ type DataPoint = {
 type DataEntry = {
     id: string;
     data: DataPoint[];
+};
+
+const theme = {
+    axis: {
+        ticks: {
+            text: {
+                fill: '#333333',
+                fontSize: 12,
+                outlineWidth: 0,
+                outlineColor: 'transparent',
+                outlineOpacity: 1
+            }
+        },
+        legend: {
+            text: {
+                fill: '#333333',
+                fontSize: 14
+            }
+        }
+    },
+    grid: {
+        line: {
+            stroke: '#dddddd',
+            strokeWidth: 1
+        }
+    }
 };
 
 /**
@@ -89,8 +116,13 @@ function convertTimestampsToTimeCategories(timestamps: string[]): DataEntry[]
 const MyResponsiveAreaBump = ({ habit }) =>
 {
     const data = convertTimestampsToTimeCategories(habit.logs);
+
+    if (!data || data.length === 0) {
+        return <div style={{ height: '400px' }}>No data available</div>;
+    }
+
     return (
-        <ResponsiveContainer width="100%" height={400}>
+        <NivoWrapper height={400}>
             <ResponsiveAreaBump
                 data={data}
                 margin={{ top: 40, right: 100, bottom: 40, left: 100 }}
@@ -106,29 +138,6 @@ const MyResponsiveAreaBump = ({ habit }) =>
                         size: 4,
                         padding: 1,
                         stagger: true
-                    },
-                    {
-                        id: 'lines',
-                        type: 'patternLines',
-                        background: 'inherit',
-                        color: '#eed312',
-                        rotation: -45,
-                        lineWidth: 6,
-                        spacing: 10
-                    }
-                ]}
-                fill={[
-                    {
-                        match: {
-                            id: 'CoffeeScript'
-                        },
-                        id: 'dots'
-                    },
-                    {
-                        match: {
-                            id: 'TypeScript'
-                        },
-                        id: 'lines'
                     }
                 ]}
                 axisTop={{
@@ -137,8 +146,7 @@ const MyResponsiveAreaBump = ({ habit }) =>
                     tickRotation: 0,
                     legend: '',
                     legendPosition: 'middle',
-                    legendOffset: -36,
-                    truncateTickAt: 0
+                    legendOffset: -36
                 }}
                 axisBottom={{
                     tickSize: 5,
@@ -146,11 +154,10 @@ const MyResponsiveAreaBump = ({ habit }) =>
                     tickRotation: 0,
                     legend: '',
                     legendPosition: 'middle',
-                    legendOffset: 32,
-                    truncateTickAt: 0
+                    legendOffset: 32
                 }}
             />
-        </ResponsiveContainer>
+        </NivoWrapper>
     )
 }
 

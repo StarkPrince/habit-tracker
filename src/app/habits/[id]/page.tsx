@@ -1,22 +1,21 @@
 'use client';
 
-import HabitAreaBump from '@/components/HabitAreaBump';
-import HabitBarChart from '@/components/HabitBarChart';
-import HabitBoxPlot from '@/components/HabitBoxPlot';
-// import HabitBullet from '@/components/HabitBulltet';
-import HabitHeatmap from '@/components/HabitHeatmap';
-import HabitLineChart from '@/components/HabitLineChart';
-import HabitPieChartByDay from '@/components/HabitPieChartByDay';
-import HabitPieChartByHour from '@/components/HabitScatterPlotByHour';
+import HabitAreaBump from "@/components/HabitAreaBump";
+import HabitBarChart from "@/components/HabitBarChart";
+import HabitHeatmap from "@/components/HabitHeatmap";
+import HabitHeatmapByMonthAndYear from "@/components/HabitHeatmapByMonthAndYear";
+import HabitLineChart from "@/components/HabitLineChart";
 import { Button } from "@/components/ui/button";
+// import HabitBullet from '@/components/HabitBulltet';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { logHabitGlobal } from '@/lib/utils';
 import { Habit } from '@/types';
 import { aggregateLogsByDay, DailyCount } from '@/utils/dataProcessing';
 import axios from 'axios';
-import { BarChart3, BoxIcon, CalendarDays, LineChart, Logs, LucideAreaChart, PieChart, ScatterChart } from "lucide-react";
+import { BarChart3, CalendarDays, LineChart, Logs, LucideAreaChart, Map } from "lucide-react";
 import { useCallback, useEffect, useState } from 'react';
+
 interface LogEntry
 {
     day: string;
@@ -169,7 +168,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
     const logEntries: LogEntry[] = processLogs(habit.logs);
 
     return (
-        <div className="max-w-6xl mx-auto p-6 space-y-6">
+        <div className="space-y-6">
             <Card>
                 <CardHeader>
                     <CardTitle className="text-3xl">{habit.name}</CardTitle>
@@ -226,7 +225,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                     <HabitHeatmap dailyCounts={dailyCounts} />
                 </CardContent>
             </Card>
-            {/* <Card>
+            <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">
                         <Map className="mr-2 h-5 w-5" />
@@ -236,7 +235,7 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                 <CardContent>
                     <HabitHeatmapByMonthAndYear habit={habit} />
                 </CardContent>
-            </Card> */}
+            </Card>
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">
@@ -259,51 +258,30 @@ const HabitDetailsPage = ({ params }: { params: { id: string } }) =>
                     <HabitBarChart dailyCounts={dailyCounts} />
                 </CardContent>
             </Card>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center">
-                        <BoxIcon className="mr-2 h-5 w-5" />
-                        Box Plot
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <HabitBoxPlot habit={habit} />
-                </CardContent>
-            </Card>
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center">
-                        <PieChart className="mr-2 h-5 w-5" />
-                        Pie Chart
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <HabitPieChartByDay habit={habit} />
-                </CardContent>
-            </Card>
-            {/* <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center">
-                        <List className="mr-2 h-5 w-5" />
-                        Bullet
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <HabitBullet habit={habit} />
-                </CardContent>
-            </Card> */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center">
-                        <ScatterChart className="mr-2 h-5 w-5" />
-                        Habit By Hour
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <HabitPieChartByHour habit={habit} />
-                </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center">
+                            <PieChart className="mr-2 h-5 w-5" />
+                            Time Distribution
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <HabitBoxPlot habit={habit} />
+                    </CardContent>
+                </Card> */}
+                {/* <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center">
+                            <TrendingUp className="mr-2 h-5 w-5" />
+                            Streak Analysis
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <HabitStreakAnalysis habit={habit} />
+                    </CardContent>
+                </Card> */}
+            </div>
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center">

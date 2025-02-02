@@ -1,6 +1,31 @@
+import { NivoWrapper } from '@/components/ui/nivo-wrapper';
 import { ResponsiveBullet } from '@nivo/bullet';
-import { ResponsiveContainer } from 'recharts';
 
+const theme = {
+    axis: {
+        ticks: {
+            text: {
+                fill: '#333333',
+                fontSize: 12,
+                outlineWidth: 0,
+                outlineColor: 'transparent',
+                outlineOpacity: 1
+            }
+        },
+        legend: {
+            text: {
+                fill: '#333333',
+                fontSize: 14
+            }
+        }
+    },
+    grid: {
+        line: {
+            stroke: '#dddddd',
+            strokeWidth: 1
+        }
+    }
+};
 
 const analyzeTimestampPatterns = (timestamps) =>
 {
@@ -99,15 +124,13 @@ const analyzeTimestampPatterns = (timestamps) =>
     });
 };
 
-
-
 const HabitBullet = ({ habit }) =>
 {
     const transformedData = analyzeTimestampPatterns(habit.logs);
     console.log(transformedData);
     return (
         <div className="px-4">
-            <ResponsiveContainer width="100%" height={400}>
+            <NivoWrapper height={400}>
                 <ResponsiveBullet
                     data={transformedData}
                     margin={{ top: 50, right: 90, bottom: 50, left: 140 }}
@@ -115,8 +138,11 @@ const HabitBullet = ({ habit }) =>
                     titleAlign="start"
                     titleOffsetX={-120}
                     measureSize={0.2}
+                    theme={theme}
+                    animate={true}
+                    motionConfig="gentle"
                 />
-            </ResponsiveContainer>
+            </NivoWrapper>
         </div>
     )
 }

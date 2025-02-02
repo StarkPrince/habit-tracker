@@ -1,9 +1,9 @@
 'use client';
 
+import { NivoWrapper } from '@/components/ui/nivo-wrapper';
 import { Habit } from '@/types';
 import { ResponsiveHeatMapCanvas } from '@nivo/heatmap';
 import React from 'react';
-import { ResponsiveContainer } from 'recharts';
 
 
 interface HeatMapDatum
@@ -25,6 +25,32 @@ type DataPoint = {
 type DataEntry = {
     id: string;
     data: DataPoint[];
+};
+
+const theme = {
+    axis: {
+        ticks: {
+            text: {
+                fill: '#333333',
+                fontSize: 12,
+                outlineWidth: 0,
+                outlineColor: 'transparent',
+                outlineOpacity: 1
+            }
+        },
+        legend: {
+            text: {
+                fill: '#333333',
+                fontSize: 14
+            }
+        }
+    },
+    grid: {
+        line: {
+            stroke: '#dddddd',
+            strokeWidth: 1
+        }
+    }
 };
 
 /**
@@ -140,9 +166,10 @@ const HabitHeatmapByMonthAndYear: React.FC<HabitHeatmapByHourAndDayProps> = ({ h
     const heatmapData = transformTimestampData(habit.logs);
     return (
         <div className="px-4">
-            <ResponsiveContainer width="100%" height={400}>
+            <NivoWrapper height={400}>
                 <ResponsiveHeatMapCanvas
                     data={heatmapData}
+                    theme={theme}
                     margin={{ top: 70, right: 130, bottom: 20, left: 80 }}
                     valueFormat=">-.2s"
                     axisTop={{
@@ -190,7 +217,7 @@ const HabitHeatmapByMonthAndYear: React.FC<HabitHeatmapByHourAndDayProps> = ({ h
                     ]}
                     annotations={[]}
                 />
-            </ResponsiveContainer>
+            </NivoWrapper>
         </div>
     );
 };

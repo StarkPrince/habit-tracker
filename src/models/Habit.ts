@@ -2,6 +2,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
 export interface IHabit extends mongoose.Document {
+  _id: string;
   user: mongoose.Types.ObjectId;
   name: string;
   createdAt: Date;
